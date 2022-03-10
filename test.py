@@ -3,7 +3,7 @@ import numpy as np
 import torch
 import os
 import argparse
-from .lib.model import ODOC_seg_edge_gru_gcn
+from modules.main_module import ODOC_seg_edge_gru_gcn
 from .utils.Dataloader_ODOC import ODOC
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
