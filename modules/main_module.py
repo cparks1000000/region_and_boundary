@@ -7,7 +7,7 @@ from torch import nn as nn, Tensor
 from torch.nn import functional as F
 
 from lib.Res2Net_v1b import res2net50_v1b_26w_4s
-from lib.model import RFB_modified, Aggregation_seg, AggregationEdge, generate_edge1, BasicConv2d, apply_all
+from lib.model import RFBModified, Aggregation_seg, AggregationEdge, GenerateEdge, BasicConv2d, apply_all
 from modules.attention.attention import Attention
 
 
@@ -24,7 +24,7 @@ class ODOC_seg_edge_gru_gcn(nn.Module):
         self._rfb: nn.ModuleList = nn.ModuleList()
 
         for resolution in resolutions:
-            self._rfb.append( RFB_modified(resolution, channel) )
+            self._rfb.append(RFBModified(resolution, channel))
 
         self._region_attentions: nn.ModuleList = nn.ModuleList()
         self._boundary_attentions: nn.ModuleList = nn.ModuleList()
@@ -47,7 +47,7 @@ class ODOC_seg_edge_gru_gcn(nn.Module):
         self.agg_seg = Aggregation_seg()
         self.agg_edge = AggregationEdge()
 
-        self.g_edge = generate_edge1()
+        self.g_edge = GenerateEdge()
         self.o_edge = nn.Sequential(
             BasicConv2d(2, 1, 3, padding=1),
             BasicConv2d(1, 1, 3, padding=1)
@@ -161,7 +161,7 @@ class ODOC_seg_edge_gru_gcn(nn.Module):
             # noinspection PyTypeChecker
             edges[i][j] = 0  # todo: Fill this in.
 
-    def forward(self, inputs: Tensor) -> Tensor:
+    def forward(self, inputs: Tensor) -> (Tensor, Tensor, Tensor):
         resnet_outputs = self.resnet(inputs)
         filtered_images = apply_all(self._rfb, resnet_outputs)
 
@@ -179,10 +179,8 @@ class ODOC_seg_edge_gru_gcn(nn.Module):
 
         edge_2 = self.agg_edge(x1_1, x2_2, x3_3, x4_4)
 
-
         seg_2_out = torch.sigmoid(seg_2)
         edge_2_out = torch.sigmoid(edge_2)
-
 
         seg_com = (seg_2[:, 0, :, :] + seg_2[:, 1, :, :]).unsqueeze(1)
         g_edge = self.g_edge(seg_com)
