@@ -7,7 +7,7 @@ from torch import nn as nn, Tensor
 from torch.nn import functional as F
 
 from lib.Res2Net_v1b import res2net50_v1b_26w_4s
-from lib.model import RFB_modified, Aggregation_seg, Aggregation_edge, generate_edge1, BasicConv2d, apply_all
+from lib.model import RFB_modified, Aggregation_seg, AggregationEdge, generate_edge1, BasicConv2d, apply_all
 from modules.attention.attention import Attention
 
 
@@ -45,7 +45,7 @@ class ODOC_seg_edge_gru_gcn(nn.Module):
         self.mlp44 = nn.Conv2d(2 * channel, channel, 1)
 
         self.agg_seg = Aggregation_seg()
-        self.agg_edge = Aggregation_edge()
+        self.agg_edge = AggregationEdge()
 
         self.g_edge = generate_edge1()
         self.o_edge = nn.Sequential(
