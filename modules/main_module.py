@@ -189,5 +189,4 @@ class ODOC_seg_edge_gru_gcn(nn.Module):
         out_edge = self.o_edge(fuse_edge) + edge_2
         out_edge = torch.sigmoid(out_edge)
 
-
         return seg_2_out, edge_2_out, out_edge
