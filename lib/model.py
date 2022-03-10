@@ -22,24 +22,25 @@ def get_gaussian_kernel(k=3, mu=0, sigma=3, normalize=True):
         gaussian_2D = gaussian_2D / np.sum(gaussian_2D)
     return gaussian_2D
 
+
 def get_sobel_kernel(k=3):
+    ranges = np.linspace(-(k // 2), k // 2, k)
 
-    range = np.linspace(-(k // 2), k // 2, k)
-
-    x, y = np.meshgrid(range, range)
+    x, y = np.meshgrid(ranges, ranges)
     sobel_2D_numerator = x
     sobel_2D_denominator = (x ** 2 + y ** 2)
     sobel_2D_denominator[:, k // 2] = 1  # avoid division by zero
     sobel_2D = sobel_2D_numerator / sobel_2D_denominator
     return sobel_2D
 
-class generate_edge1(nn.Module):
+
+class GenerateEdge(nn.Module):
     def __init__(self,
                  k_gaussian=3,
                  mu=0,
                  sigma=1,
                  k_sobel=3):
-        super(generate_edge1, self).__init__()
+        super().__init__()
 
         # gaussian
         gaussian_2D = get_gaussian_kernel(k_gaussian, mu, sigma)
@@ -116,9 +117,9 @@ class BasicConv2d(nn.Module):
         return x
 
 
-class RFB_modified(nn.Module):
+class RFBModified(nn.Module):
     def __init__(self, in_channel, out_channel):
-        super(RFB_modified, self).__init__()
+        super(RFBModified, self).__init__()
         self.relu = nn.ReLU(True)
         self.branch0 = nn.Sequential(
             BasicConv2d(in_channel, out_channel, 1),
