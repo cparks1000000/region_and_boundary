@@ -24,22 +24,18 @@ def get_gaussian_kernel(k=3, mu=0, sigma=3, normalize=True):
 
 def get_sobel_kernel(k=3):
 
-    range = np.linspace(-(k // 2), k // 2, k)
+    range = np.linspace(-(k // 2), k // 2, k)  # linspace(): creates an evenly spaced sequence in a specified interval
 
-    x, y = np.meshgrid(range, range)
+    x, y = np.meshgrid(range, range)  #creating a rectangular grid
     sobel_2D_numerator = x
-    sobel_2D_denominator = (x ** 2 + y ** 2)
+    sobel_2D_denominator = (x ** 2 + y ** 2)  #x^2 + y^2
     sobel_2D_denominator[:, k // 2] = 1  # avoid division by zero
     sobel_2D = sobel_2D_numerator / sobel_2D_denominator
     return sobel_2D
 
 class generate_edge1(nn.Module):
-    def __init__(self,
-                 k_gaussian=3,
-                 mu=0,
-                 sigma=1,
-                 k_sobel=3):
-        super(generate_edge1, self).__init__()
+    def __init__(self, k_gaussian=3, mu=0, sigma=1, k_sobel=3):
+        super().__init__()
 
         # gaussian
         gaussian_2D = get_gaussian_kernel(k_gaussian, mu, sigma)
@@ -88,7 +84,6 @@ class generate_edge1(nn.Module):
             grad_x = grad_x + self.sobel_filter_x(img[:, c:c + 1])
             grad_y = grad_y + self.sobel_filter_y(img[:, c:c + 1])
 
-
         grad_x, grad_y = grad_x / C, grad_y / C
 
         grad_magnitude = (grad_x ** 2 + grad_y ** 2) ** 0.5
@@ -103,7 +98,7 @@ T = Union[int, (int, int)]
 
 class BasicConv2d(nn.Module):
     def __init__(self, in_planes: int, out_planes: int, kernel_size: T, stride: T = 1, padding: T = 0, dilation: T = 1) -> None:
-        super(BasicConv2d, self).__init__()
+        super().__init__()
         self.conv = nn.Conv2d(in_planes, out_planes,
                               kernel_size=kernel_size, stride=stride,
                               padding=padding, dilation=dilation, bias=False)
@@ -118,7 +113,7 @@ class BasicConv2d(nn.Module):
 
 class RFB_modified(nn.Module):
     def __init__(self, in_channel, out_channel):
-        super(RFB_modified, self).__init__()
+        super().__init__()
         self.relu = nn.ReLU(True)
         self.branch0 = nn.Sequential(
             BasicConv2d(in_channel, out_channel, 1),
@@ -157,7 +152,7 @@ class RFB_modified(nn.Module):
 
 class Aggregation_seg(nn.Module):
     def __init__(self, in_fea=[32, 32, 32], mid_fea=16, out_fea=2):
-        super(Aggregation_seg, self).__init__()
+        super().__init__()
         self.conv1 = nn.Sequential(
             nn.Conv2d(in_fea[0], mid_fea, kernel_size=1, padding=0, dilation=1, bias=False),
             nn.BatchNorm2d(mid_fea)
@@ -177,7 +172,7 @@ class Aggregation_seg(nn.Module):
         _, _, h, w = high.size()
         up_low1 = self.conv4(self.conv1(low1))
         up_low2 = self.conv4(self.conv2(low2))
-        up_low3 = self.conv4(self.conv3(low2))
+        up_low3 = self.conv4(self.conv3(low3))
         cat = torch.cat((up_low1, up_low2, up_low3), dim=1)
         output = self.conv5(cat)
         return output

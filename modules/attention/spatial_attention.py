@@ -5,8 +5,8 @@ from torch import nn as nn
 
 class SpatialAttention(nn.Module):
     def __init__(self, kernel_size=7):
-        super(SpatialAttention, self).__init__()
-
+        # super(SpatialAttention, self).__init__()
+        super().__init__()
         assert kernel_size in (3, 7), 'kernel size must be 3 or 7'
         padding = 3 if kernel_size == 7 else 1
 
