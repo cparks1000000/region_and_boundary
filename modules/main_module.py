@@ -1,8 +1,7 @@
 from itertools import product
 from typing import List
 
-import \
-    torch
+import torch
 from torch import nn as nn, Tensor
 from torch.nn import functional as F
 
