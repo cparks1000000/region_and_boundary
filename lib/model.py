@@ -39,7 +39,7 @@ class generate_edge1(nn.Module):
 
         # gaussian
         gaussian_2D = get_gaussian_kernel(k_gaussian, mu, sigma)
-        self.gaussian_filter = nn.Conv2d(in_channels=1,
+        self.cc = nn.Conv2d(in_channels=1,
                                          out_channels=1,
                                          kernel_size=k_gaussian,
                                          padding=k_gaussian // 2,
