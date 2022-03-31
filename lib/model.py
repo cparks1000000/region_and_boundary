@@ -32,7 +32,8 @@ def get_sobel_kernel(k=3):
     sobel_2D = sobel_2D_numerator / sobel_2D_denominator
     return sobel_2D
 
-class generate_edge1(nn.Module):
+
+class GenerateEdge(nn.Module):
     def __init__(self, k_gaussian=3, mu=0, sigma=1, k_sobel=3):
         super().__init__()
 
@@ -149,53 +150,26 @@ class RFBModified(nn.Module):
         return x
 
 
-class Aggregation_seg(nn.Module):
-    def __init__(self, in_fea=[32, 32, 32], mid_fea=16, out_fea=2):
-        super().__init__()
-        self.conv1 = nn.Sequential(
-            nn.Conv2d(in_fea[0], mid_fea, kernel_size=1, padding=0, dilation=1, bias=False),
-            nn.BatchNorm2d(mid_fea)
-        )
-        self.conv2 = nn.Sequential(
-            nn.Conv2d(in_fea[1], mid_fea, kernel_size=1, padding=0, dilation=1, bias=False),
-            nn.BatchNorm2d(mid_fea)
-        )
-        self.conv3 = nn.Sequential(
-            nn.Conv2d(in_fea[2], mid_fea, kernel_size=1, padding=0, dilation=1, bias=False),
-            nn.BatchNorm2d(mid_fea)
-        )
-        self.conv4 = nn.Conv2d(mid_fea, out_fea, kernel_size=3, padding=1, dilation=1, bias=True)
-        self.conv5 = nn.Conv2d(out_fea * 3, out_fea, kernel_size=1, padding=0, dilation=1, bias=True)
-
-    def forward(self, high, low1, low2, low3):
-        _, _, h, w = high.size()
-        up_low1 = self.conv4(self.conv1(low1))
-        up_low2 = self.conv4(self.conv2(low2))
-        up_low3 = self.conv4(self.conv3(low3))
-        cat = torch.cat((up_low1, up_low2, up_low3), dim=1)
-        output = self.conv5(cat)
-        return output
-
-
-class AggregationEdge(nn.Module):
+class Aggregation(nn.Module):
     def __init__(self, in_fea=[32, 32, 32], mid_fea=16, out_fea=1):
         super().__init__()
         self.conv1 = nn.Sequential(
-            nn.Conv2d(in_fea[0], mid_fea, kernel_size=1, padding=0, dilation=1, bias=False),
+            nn.Conv2d(in_fea[0], mid_fea, kernel_size=1, bias=False),
             nn.BatchNorm2d(mid_fea)
         )
         self.conv2 = nn.Sequential(
-            nn.Conv2d(in_fea[1], mid_fea, kernel_size=1, padding=0, dilation=1, bias=False),
+            nn.Conv2d(in_fea[1], mid_fea, kernel_size=1, bias=False),
             nn.BatchNorm2d(mid_fea)
         )
         self.conv3 = nn.Sequential(
-            nn.Conv2d(in_fea[2], mid_fea, kernel_size=1, padding=0, dilation=1, bias=False),
+            nn.Conv2d(in_fea[2], mid_fea, kernel_size=1, bias=False),
             nn.BatchNorm2d(mid_fea)
         )
-        self.conv4 = nn.Conv2d(mid_fea, out_fea, kernel_size=3, padding=1, dilation=1, bias=True)
-        self.conv5 = nn.Conv2d(out_fea * 3, out_fea, kernel_size=1, padding=0, dilation=1, bias=True)
+        self.conv4 = nn.Conv2d(mid_fea, out_fea, kernel_size=3, padding=1)
+        self.conv5 = nn.Conv2d(out_fea * 3, out_fea, kernel_size=1)
 
-    def forward(self, high, low1, low2, low3):
+    def forward(self, nodes: List[Tensor]):
+        high, low1, low2, low3 = nodes
         _, _, h, w = high.size()
         up_low1 = self.conv4(self.conv1(low1))
         up_low2 = self.conv4(self.conv2(low2))
