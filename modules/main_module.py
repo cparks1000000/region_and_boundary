@@ -13,8 +13,8 @@ from modules.attention.attention import Attention
 class ODOC_seg_edge_gru_gcn(nn.Module):
 
     def __init__(self, channel=32):
-        super(ODOC_seg_edge_gru_gcn, self).__init__()
-
+        # super(ODOC_seg_edge_gru_gcn, self).__init__()
+        super().__init__()
         self.resnet = res2net50_v1b_26w_4s(pretrained=True)
         self.resnet.make_backbone()
 

@@ -6,10 +6,10 @@ import torch.utils.model_zoo as model_zoo
 import torch
 import os
 import torch.nn.functional as F
+from torch import Tensor
 
 __all__ = ['Res2Net', 'res2net50_v1b', 'res2net101_v1b', 'res2net50_v1b_26w_4s']
 
-from torch import Tensor
 
 model_urls = {
     'res2net50_v1b_26w_4s': 'https://shanghuagao.oss-cn-beijing.aliyuncs.com/res2net/res2net50_v1b_26w_4s-3cf99910.pth',
