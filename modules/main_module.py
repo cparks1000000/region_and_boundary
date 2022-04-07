@@ -30,16 +30,6 @@ class ODOCSegEdgeGruGcn(nn.Module):
             self._region_attentions.append(Attention(channel))
             self._boundary_attentions.append(Attention(channel))
         
-        self.mlp1 = nn.Conv2d(2 * channel, channel, 1)
-        self.mlp2 = nn.Conv2d(2 * channel, channel, 1)
-        self.mlp3 = nn.Conv2d(2 * channel, channel, 1)
-        self.mlp4 = nn.Conv2d(2 * channel, channel, 1)
-        
-        self.mlp11 = nn.Conv2d(2 * channel, channel, 1)
-        self.mlp22 = nn.Conv2d(2 * channel, channel, 1)
-        self.mlp33 = nn.Conv2d(2 * channel, channel, 1)
-        self.mlp44 = nn.Conv2d(2 * channel, channel, 1)
-        
         self._edge_convolutions = nn.ModuleList()
         
         for _ in resolutions:
