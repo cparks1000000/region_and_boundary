@@ -26,7 +26,7 @@ class ODOC(Dataset):
 
     def __getitem__(self, idx):
         image_name = self.image_list[idx]
-        h5f = h5py.File(self._base_dir + '/h5py_all' + '/'+image_name, 'r')
+        h5f = h5py.File(self._base_dir + '/h5py_all' + '/' + image_name, 'r')
         image = self.test_transform(h5f['img'][:])
         label = functional.to_tensor(h5f['mask'][:])
         con_gau = functional.to_tensor(h5f['con_gau'][:])

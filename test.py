@@ -4,7 +4,7 @@ import torch
 import os
 import argparse
 from modules.main_module import ODOCSegEdgeGruGcn
-from .utils.Dataloader_ODOC import ODOC
+from utils.Dataloader_ODOC import ODOC
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 
@@ -19,6 +19,8 @@ train_data_path = args.root_path
 snapshot_path = "./model"
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 saved_model_path = os.path.join(snapshot_path, 'best_model.pth')
+
+
 
 if __name__ == "__main__":
     model = ODOCSegEdgeGruGcn()
@@ -39,13 +41,12 @@ if __name__ == "__main__":
             pred_edge = F.upsample(input=edge_outputs1, size=(256, 256), mode='bilinear')
             g_edge_output = F.upsample(input=g_edge_1, size=(256, 256), mode='bilinear')
             pred_seg = F.upsample(input=outputs1, size=(256, 256), mode='bilinear')
+            
             # seg
-            y_pre = pred_seg.cpu().data.numpy().squeeze()
-            y_pre_gt = label_batch.cpu().data.numpy().squeeze()
-
-
-            y_map_cup = (y_pre[0] > 0.5).astype(np.uint8)
-            y_map_disc = (y_pre[1] > 0.5).astype(np.uint8)
+            y_predicted = pred_seg.cpu().data.numpy().squeeze()
+            y_label = label_batch.cpu().data.numpy().squeeze()
+            y_map_cup = (y_predicted[0] > 0.5).astype(np.uint8)
+            y_map_disc = (y_predicted[1] > 0.5).astype(np.uint8)
 
             """
             "uncomment below if a smoother boundary"
@@ -89,11 +90,3 @@ if __name__ == "__main__":
             plt.subplot(1, 4, 2)
             plt.imshow(y_map_disc, cmap='gray')
             plt.show()
-
-
-
-
-
-
-
-

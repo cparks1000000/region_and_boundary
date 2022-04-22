@@ -3,7 +3,6 @@ from typing import List
 
 import torch
 from torch import nn as nn, Tensor
-from torch.nn import functional as F
 
 from lib.Res2Net_v1b import res2net50_v1b_26w_4s
 from lib.model import RFBModified, Aggregation, BasicConv2d, apply_all, GenerateEdge
@@ -12,17 +11,16 @@ from modules.attention.attention import Attention
 
 class ODOCSegEdgeGruGcn(nn.Module):
     def __init__(self, channel: int = 32) -> None:
-        # super(ODOC_seg_edge_gru_gcn, self).__init__()
         super().__init__()
         self.resnet = res2net50_v1b_26w_4s(pretrained=True)
         self.resnet.make_backbone()
         
-        resolutions = [256, 512, 1024, 2048]
+        channel_counts = [256, 512, 1024, 2048]
         
         self._rfb: nn.ModuleList = nn.ModuleList()
         
-        for resolution in resolutions:
-            self._rfb.append(RFBModified(resolution, channel))
+        for channel_count in channel_counts:
+            self._rfb.append(RFBModified(channel_count, channel))
         
         self._region_attentions: nn.ModuleList = nn.ModuleList()
         self._boundary_attentions: nn.ModuleList = nn.ModuleList()
@@ -32,7 +30,7 @@ class ODOCSegEdgeGruGcn(nn.Module):
         
         self._edge_convolutions = nn.ModuleList()
         
-        for _ in resolutions:
+        for _ in channel_counts:
             self._edge_convolutions.append(
                 nn.Conv2d(2 * channel, channel, 1)
             )
@@ -40,8 +38,8 @@ class ODOCSegEdgeGruGcn(nn.Module):
                 nn.Conv2d(2 * channel, channel, 1)
             )
         
-        self.region_aggregation = Aggregation(out_fea=2)
-        self.edge_aggregation = Aggregation(out_fea=1)
+        self.region_aggregation = Aggregation(out_features=2)
+        self.edge_aggregation = Aggregation(out_features=1)
         
         self.g_edge = GenerateEdge()
         self.o_edge = nn.Sequential(

@@ -151,23 +151,18 @@ class RFBModified(nn.Module):
 
 
 class Aggregation(nn.Module):
-    def __init__(self, in_fea=[32, 32, 32], mid_fea=16, out_fea=1):
+    def __init__(self, in_features: List[int], intermediate_features: int = 16, out_features: int = 1):
         super().__init__()
-        self.conv1 = nn.Sequential(
-            nn.Conv2d(in_fea[0], mid_fea, kernel_size=1, bias=False),
-            nn.BatchNorm2d(mid_fea)
-        )
-        self.conv2 = nn.Sequential(
-            nn.Conv2d(in_fea[1], mid_fea, kernel_size=1, bias=False),
-            nn.BatchNorm2d(mid_fea)
-        )
-        self.conv3 = nn.Sequential(
-            nn.Conv2d(in_fea[2], mid_fea, kernel_size=1, bias=False),
-            nn.BatchNorm2d(mid_fea)
-        )
-        self.conv4 = nn.Conv2d(mid_fea, out_fea, kernel_size=3, padding=1)
-        self.conv5 = nn.Conv2d(out_fea * 3, out_fea, kernel_size=1)
-
+        self._reshape = nn.ModuleList()
+        for in_feature in in_features:
+            self._reshape.append(nn.Sequential(
+                nn.Conv2d(in_feature, intermediate_features, kernel_size=1, bias=False),
+                nn.BatchNorm2d(intermediate_features)
+            ))
+        self.conv4 = nn.Conv2d(intermediate_features, out_features, kernel_size=3, padding=1)
+        self.conv5 = nn.Conv2d(out_features * 3, out_features, kernel_size=1)
+    
+    # This function assumes that the
     def forward(self, nodes: List[Tensor]):
         high, low1, low2, low3 = nodes
         _, _, h, w = high.size()
